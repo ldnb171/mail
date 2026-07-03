@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generator.Email Redirect</title>
+
+<style>
+
+body{
+    margin:0;
+    background:#f5f5f5;
+    font-family:Arial,sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.container{
+    background:#fff;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,.15);
+    width:520px;
+}
+
+h2{
+    margin-top:0;
+    text-align:center;
+}
+
+.input-group{
+    display:flex;
+    gap:10px;
+}
+
+input{
+    flex:1;
+    padding:10px;
+    font-size:16px;
+    border:1px solid #ccc;
+    border-radius:6px;
+}
+
+button{
+    padding:10px 18px;
+    font-size:16px;
+    border:none;
+    border-radius:6px;
+    background:#007bff;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#0056b3;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Generator.Email</h2>
+
+<div class="input-group">
+
+<input
+id="email"
+type="email"
+placeholder="Nhập email...">
+
+<button onclick="pasteClipboard()">
+Dán
+</button>
+
+<button onclick="openMailbox()">
+Mở
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+function isEmail(text){
+
+    return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(text.trim());
+
+}
+
+// ===============================
+// Tự đọc clipboard khi mở trang
+// ===============================
+
+async function autoPasteOnLoad(){
+
+    try{
+
+        const text=(await navigator.clipboard.readText()).trim();
+
+        if(isEmail(text)){
+
+            document.getElementById("email").value=text;
+
+        }
+
+    }catch(err){
+
+        // Không có quyền thì bỏ qua
+
+    }
+
+}
+
+// ===============================
+// Nút Dán
+// ===============================
+
+async function pasteClipboard(){
+
+    try{
+
+        const text=(await navigator.clipboard.readText()).trim();
+
+        if(isEmail(text)){
+
+            document.getElementById("email").value=text;
+
+        }else{
+
+            alert("Clipboard không chứa email hợp lệ.");
+
+        }
+
+    }catch(err){
+
+        alert("Không thể đọc clipboard.\nHãy cấp quyền cho trình duyệt.");
+
+    }
+
+}
+
+// ===============================
+// Mở Generator.Email
+// ===============================
+
+function openMailbox(){
+
+    const email=document.getElementById("email").value.trim();
+
+    if(email===""){
+
+        alert("Vui lòng nhập email.");
+
+        return;
+
+    }
+
+    if(!isEmail(email)){
+
+        alert("Email không hợp lệ.");
+
+        return;
+
+    }
+
+    const url="https://generator.email/"+encodeURIComponent(email);
+
+    window.open(url,"_blank");
+
+}
+
+// ===============================
+// Enter
+// ===============================
+
+document.getElementById("email").addEventListener("keydown",function(e){
+
+    if(e.key==="Enter"){
+
+        openMailbox();
+
+    }
+
+});
+
+// ===============================
+// Khi mở web
+// ===============================
+
+window.addEventListener("load",autoPasteOnLoad);
+
+</script>
+
+</body>
+</html>
