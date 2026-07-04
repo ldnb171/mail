@@ -70,7 +70,7 @@ button:hover{
 
 <input
 id="email"
-type="email"
+type="text"
 placeholder="Nhập email...">
 
 <button onclick="pasteClipboard()">
@@ -87,25 +87,45 @@ Mở
 
 <script>
 
-function isEmail(text){
+// =====================================
+// Tách email đầu tiên tìm thấy
+// =====================================
 
-    return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(text.trim());
+function extractEmail(text){
+
+    if(!text) return null;
+
+    const match = text.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
+
+    return match ? match[0] : null;
 
 }
 
-// ===============================
-// Tự đọc clipboard khi mở trang
-// ===============================
+// =====================================
+// Kiểm tra email
+// =====================================
+
+function isEmail(text){
+
+    return extractEmail(text)!==null;
+
+}
+
+// =====================================
+// Tự đọc clipboard khi mở web
+// =====================================
 
 async function autoPasteOnLoad(){
 
     try{
 
-        const text=(await navigator.clipboard.readText()).trim();
+        const text = await navigator.clipboard.readText();
 
-        if(isEmail(text)){
+        const email = extractEmail(text);
 
-            document.getElementById("email").value=text;
+        if(email){
+
+            document.getElementById("email").value = email;
 
         }
 
@@ -117,23 +137,25 @@ async function autoPasteOnLoad(){
 
 }
 
-// ===============================
+// =====================================
 // Nút Dán
-// ===============================
+// =====================================
 
 async function pasteClipboard(){
 
     try{
 
-        const text=(await navigator.clipboard.readText()).trim();
+        const text = await navigator.clipboard.readText();
 
-        if(isEmail(text)){
+        const email = extractEmail(text);
 
-            document.getElementById("email").value=text;
+        if(email){
+
+            document.getElementById("email").value = email;
 
         }else{
 
-            alert("Clipboard không chứa email hợp lệ.");
+            alert("Không tìm thấy email trong clipboard.");
 
         }
 
@@ -145,23 +167,17 @@ async function pasteClipboard(){
 
 }
 
-// ===============================
+// =====================================
 // Mở Generator.Email
-// ===============================
+// =====================================
 
 function openMailbox(){
 
-    const email=document.getElementById("email").value.trim();
+    const value = document.getElementById("email").value.trim();
 
-    if(email===""){
+    const email = extractEmail(value);
 
-        alert("Vui lòng nhập email.");
-
-        return;
-
-    }
-
-    if(!isEmail(email)){
+    if(!email){
 
         alert("Email không hợp lệ.");
 
@@ -169,15 +185,15 @@ function openMailbox(){
 
     }
 
-    const url="https://generator.email/"+encodeURIComponent(email);
+    const url = "https://generator.email/" + encodeURIComponent(email);
 
     window.open(url,"_blank");
 
 }
 
-// ===============================
+// =====================================
 // Enter
-// ===============================
+// =====================================
 
 document.getElementById("email").addEventListener("keydown",function(e){
 
@@ -189,9 +205,9 @@ document.getElementById("email").addEventListener("keydown",function(e){
 
 });
 
-// ===============================
+// =====================================
 // Khi mở web
-// ===============================
+// =====================================
 
 window.addEventListener("load",autoPasteOnLoad);
 
